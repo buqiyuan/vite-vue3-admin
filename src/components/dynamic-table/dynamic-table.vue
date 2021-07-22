@@ -26,7 +26,7 @@
     >
       <!--        自定义渲染start-->
       <slot
-        v-if="$slots[slotItem.slots?.customRender]"
+        v-if="slotItem.slots?.customRender && $slots[slotItem.slots?.customRender]"
         :name="slotItem.slots?.customRender"
         v-bind="slotProps"
       ></slot>
@@ -105,6 +105,7 @@ import { Card, Select, Table, Popconfirm } from 'ant-design-vue'
 import { TableProps } from 'ant-design-vue/lib/table/interface'
 import { usePagination, PageOption } from '@/hooks/usePagination'
 import { useDragRow, useDragCol } from './hooks'
+import { isFunction } from '@/utils/is'
 
 export default defineComponent({
   name: 'DynamicTable',
@@ -144,8 +145,9 @@ export default defineComponent({
     },
     dragRowEnable: Boolean as PropType<boolean>
   },
-  emits: ['change'],
-  setup(props, { emit }) {
+  emits: ['change', 'update:pageOption'],
+  setup(props, { emit, slots }) {
+    console.log('slots', slots)
     const { pageOptions } = usePagination()
 
     Object.assign(pageOptions.value, props.pageOption)
@@ -158,21 +160,26 @@ export default defineComponent({
       customRow: () => ({} as TableProps['customRow']),
       data: [], // 表格数据
       actions:
-        props.columns.find((item) => (item.dataIndex || item.key) == 'action')?.actions || [], // 表格操作（如：编辑、删除的按钮等）
+        props.columns.find((item) => [item.dataIndex, item.key].includes('action'))?.actions || [], // 表格操作（如：编辑、删除的按钮等）
       loading: false // 表格加载
     })
 
-    // 获取表格数据
-    const refreshTableData = async (params = {}) => {
-      params = {
-        pageNumber: pageOptions.value.current,
+    /**
+     * @param {object} params 表格查询参数
+     * @param {boolean} flush 是否将页数重置到第一页
+     * @description 获取表格数据
+     */
+    const refreshTableData = async (params = {}, flush = false) => {
+      if (!isFunction(props.getListFunc)) return
+      const queryParams = {
+        pageNumber: flush ? 1 : pageOptions.value.current,
         pageSize: pageOptions.value.pageSize,
         ...props.pageOption,
         ...params
       }
       state.loading = true
       const { data, pageNumber, pageSize, total } = await props
-        .getListFunc(params)
+        .getListFunc(queryParams)
         .finally(() => (state.loading = false))
       Object.assign(pageOptions.value, {
         current: ~~pageNumber,
@@ -196,7 +203,9 @@ export default defineComponent({
       }
     }
 
-    // 分页改变
+    /**
+     * @description 分页改变
+     */
     const paginationChange = (pagination, filters, sorter, { currentDataSource }) => {
       const { field, order } = sorter
       console.log(pagination)

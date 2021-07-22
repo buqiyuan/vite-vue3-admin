@@ -100,7 +100,7 @@
 import { defineComponent, reactive, computed, toRefs, unref, provide, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import components from '@/layout/tabs/components'
-import { storage } from '@/utils/Storage'
+import { Storage } from '@/utils/Storage'
 import { TABS_ROUTES } from '@/store/mutation-types'
 import { useStore } from '@/store'
 import { RouteItem } from '@/store/modules/tabs-view/state'
@@ -127,7 +127,7 @@ export default defineComponent({
     let routes: RouteItem[] = []
 
     try {
-      const routesStr = storage.get(TABS_ROUTES) as string | null | undefined
+      const routesStr = Storage.get(TABS_ROUTES) as string | null | undefined
       routes = routesStr ? JSON.parse(routesStr) : [getSimpleRoute(route)]
     } catch (e) {
       routes = [getSimpleRoute(route)]
@@ -192,7 +192,7 @@ export default defineComponent({
 
     // 在页面关闭或刷新之前，保存数据
     window.addEventListener('beforeunload', () => {
-      storage.set(TABS_ROUTES, JSON.stringify(tabsList.value))
+      Storage.set(TABS_ROUTES, JSON.stringify(tabsList.value))
     })
 
     // 关闭当前页面

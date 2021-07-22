@@ -1,12 +1,12 @@
 <template>
-  <config-provider v-show="!isLock" :locale="zhCN">
+  <config-provider :locale="zhCN">
     <router-view v-slot="{ Component }">
       <component :is="Component" />
     </router-view>
+    <transition name="slide-up">
+      <lock-screen v-if="isLock && $route.name != 'login'" />
+    </transition>
   </config-provider>
-  <transition name="slide-up">
-    <lock-screen v-if="isLock && $route.name != 'login'" />
-  </transition>
 </template>
 
 <script lang="ts">

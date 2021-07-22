@@ -18,7 +18,7 @@
       </div>
       <!--      华为充电-->
       <component
-        :is="Math.random() > 0.48 ? 'xiaomi-charge' : 'huawei-charge'"
+        :is="randomCompName"
         :battery="battery"
         :battery-status="batteryStatus"
         :calc-discharging-time="calcDischargingTime"
@@ -113,6 +113,7 @@ export default defineComponent({
     const { battery, batteryStatus, calcDischargingTime } = useBattery()
 
     const state = reactive({
+      randomCompName: Math.random() > 0.48 ? 'xiaomi-charge' : 'huawei-charge',
       isShowLogin: false,
       loginLoading: false, // 正在登录
       loginForm: {
@@ -190,7 +191,7 @@ export default defineComponent({
   background: #000;
 
   &.unLockLogin {
-    background-color: rgba(25, 28, 34, 0.88);
+    background-color: rgba(25, 28, 34, 0.78);
     backdrop-filter: blur(7px);
   }
 

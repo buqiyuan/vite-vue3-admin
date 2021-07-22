@@ -2,7 +2,7 @@ import { isNavigationFailure, Router } from 'vue-router'
 import store from '@/store'
 import NProgress from 'nprogress' // progress bar
 import { ACCESS_TOKEN } from '@/store/mutation-types'
-import { storage } from '@/utils/Storage'
+import { Storage } from '@/utils/Storage'
 import { debounce } from '@/utils/lodashChunk'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
@@ -42,7 +42,7 @@ const isGetMenus = debounce(
 export function createRouterGuards(router: Router) {
   router.beforeEach((to, from, next) => {
     NProgress.start() // start progress bar
-    const token = storage.get(ACCESS_TOKEN)
+    const token = Storage.get(ACCESS_TOKEN)
     if (token) {
       if (to.name === 'login') {
         next({ path: defaultRoutePath })
@@ -50,7 +50,7 @@ export function createRouterGuards(router: Router) {
       } else {
         const hasRoute = router.hasRoute(to.name!)
         // 如果不需要每次切换路由获取最新的动态路由，可把下面注释放开
-        // if (store.getters.menus.length === 0) {
+        // if (store.getters['asyncRoute/menus'].length === 0) {
         // generate dynamic router
         // 防抖获取菜单
         isGetMenus({ to, from, next, hasRoute })
@@ -60,7 +60,7 @@ export function createRouterGuards(router: Router) {
           next()
         }
         // } else {
-        //     next()
+        //   next()
         // }
       }
     } else {

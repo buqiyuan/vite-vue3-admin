@@ -22,11 +22,3 @@ declare type CustomizedHTMLElement<T> = HTMLElement & T
 declare type Indexable<T> = {
   [key: string]: T
 }
-
-declare module '@vue/runtime-core' {
-  export interface ComponentCustomProperties {
-    $hasPermission: any
-  }
-}
-
-export {}

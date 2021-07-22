@@ -5,15 +5,15 @@
         <component :is="collapsed ? 'menu-unfold-outlined' : 'menu-fold-outlined'" />
       </span>
       <a-breadcrumb>
-        <template v-for="routeItem in route.matched" :key="routeItem.name">
+        <template v-for="(routeItem, rotueIndex) in $route.matched" :key="routeItem.name">
           <a-breadcrumb-item>
-            <a>{{ routeItem.meta.title }}</a>
-            <template #overlay>
-              <a-menu v-if="routeItem.children.length">
+            <span>{{ routeItem.meta.title }}</span>
+            <template v-if="routeItem.children.length" #overlay>
+              <a-menu :selectedKeys="[$route.matched[rotueIndex + 1]?.name]">
                 <template v-for="childItem in routeItem.children">
-                  <a-menu-item v-if="!childItem.meta.hidden" :key="childItem.name">
-                    <router-link :to="{ name: childItem.name }">
-                      {{ childItem.meta.title }}
+                  <a-menu-item v-if="!childItem.meta?.hidden" :key="childItem.name">
+                    <router-link :to="{ name: childItem.name }" custom #="{ navigate }">
+                      <div @click="navigate">{{ childItem.meta?.title }}</div>
                     </router-link>
                   </a-menu-item>
                 </template>
@@ -39,11 +39,11 @@
         <template #overlay>
           <a-menu>
             <a-menu-item>
-              <a href="javascript:;">个人中心</a>
+              <div>个人中心</div>
             </a-menu-item>
             <a-menu-divider />
             <a-menu-item>
-              <a @click.prevent="doLogout"><poweroff-outlined /> 退出登录</a>
+              <div @click.prevent="doLogout"><poweroff-outlined /> 退出登录</div>
             </a-menu-item>
           </a-menu>
         </template>
@@ -157,8 +157,7 @@ export default defineComponent({
       ...toRefs(state),
       iconList,
       toggleFullScreen,
-      doLogout,
-      route
+      doLogout
     }
   }
 })

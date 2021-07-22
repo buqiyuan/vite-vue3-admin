@@ -8,15 +8,15 @@ import { checkStatus } from './checkStatus'
 import { Modal, message as Message } from 'ant-design-vue'
 import { RequestEnum, ResultEnum, ContentTypeEnum } from '@/enums/httpEnum'
 
-import { isString } from '@/utils/is/'
+import { isString } from '@/utils/is/index'
 import { setObjToUrlParams } from '@/utils/urlUtils'
 
 import { RequestOptions, Result } from './types'
 
-const isDev = import.meta.env.DEV
+const isDev = process.env.NODE_ENV === 'development'
 import router from '@/router'
 import store from '@/store'
-import { storage } from '@/utils/Storage'
+import { Storage } from '@/utils/Storage'
 /**
  * @description: 数据处理，方便区分多种处理方式
  */
@@ -98,7 +98,7 @@ const transform: AxiosTransform = {
               redirect: router.currentRoute.value.fullPath
             }
           })
-          storage.clear()
+          Storage.clear()
         }
       })
       return reject(new Error(timeoutMsg))
@@ -114,7 +114,7 @@ const transform: AxiosTransform = {
 
   // 请求之前处理config
   beforeRequestHook: (config, options) => {
-    const { apiUrl, joinPrefix, joinParamsToUrl, formatDate, isParseToJson } = options
+    const { apiUrl, joinParamsToUrl } = options
 
     config.url = isDev ? `/api${config.url}` : `${apiUrl || ''}${config.url}`
 
@@ -144,11 +144,6 @@ const transform: AxiosTransform = {
         config.url = config.url + config.params
         config.params = {}
       }
-      // 'a[]=b&a[]=c'
-      if (!isParseToJson) {
-        config.params = qs.stringify(config.params, { arrayFormat: 'brackets' })
-        config.data = qs.stringify(config.data, { arrayFormat: 'brackets' })
-      }
     }
     return config
   },
@@ -162,6 +157,13 @@ const transform: AxiosTransform = {
     if (token) {
       // jwt token
       config.headers.token = token
+    }
+    if (config.method?.toLocaleUpperCase() !== RequestEnum.GET) {
+      // 对FORM_URLENCODED类型进行转换
+      if (config.headers?.['Content-Type'] == ContentTypeEnum.FORM_URLENCODED) {
+        // config.params = qs.stringify(config.params, { arrayFormat: 'brackets' })
+        config.data = qs.stringify(config.data, { arrayFormat: 'brackets' })
+      }
     }
     return config
   },

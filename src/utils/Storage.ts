@@ -123,6 +123,6 @@ export const createStorage = ({ prefixKey = '', storage = localStorage } = {}) =
   return new Storage()
 }
 
-export const storage = createStorage()
+export const Storage = createStorage()
 
 export default Storage

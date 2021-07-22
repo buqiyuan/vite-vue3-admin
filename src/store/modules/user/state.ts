@@ -1,6 +1,5 @@
-import { createStorage } from '@/utils/Storage'
+import { Storage } from '@/utils/Storage'
 import { ACCESS_TOKEN, CURRENT_USER } from '@/store/mutation-types'
-const Storage = createStorage({ storage: localStorage })
 
 export type IUserState = {
   token: string

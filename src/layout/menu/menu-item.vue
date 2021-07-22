@@ -3,14 +3,14 @@
     <a-sub-menu v-if="menuInfo.children?.length" :key="menuInfo.name" v-bind="$attrs">
       <template #title>
         <span>
-          <icon-font style="color: aliceblue" :type="menuInfo.meta.icon" />
+          <icon-font :type="menuInfo.meta.icon" />
           <span>{{ menuInfo.meta.title }}</span>
         </span>
       </template>
       <template v-for="item in menuInfo.children" :key="item.name">
         <template v-if="!item.children">
           <a-menu-item :key="item.name">
-            <icon-font style="color: aliceblue" :type="item.meta.icon" />
+            <icon-font :type="item.meta.icon" />
             <span>{{ item.meta.title }}</span>
           </a-menu-item>
         </template>
@@ -20,7 +20,7 @@
       </template>
     </a-sub-menu>
     <a-menu-item v-else :key="menuInfo.name">
-      <icon-font style="color: aliceblue" :type="menuInfo.meta.icon" />
+      <icon-font :type="menuInfo.meta.icon" />
       <span>{{ menuInfo.meta.title }}</span>
     </a-menu-item>
   </template>

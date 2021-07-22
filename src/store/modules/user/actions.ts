@@ -2,7 +2,7 @@ import { ActionContext } from 'vuex'
 import { IUserState } from './state'
 import { getUserInfo, login } from '@/api/system/user'
 import { ACCESS_TOKEN, CURRENT_USER, IS_LOCKSCREEN } from '@/store/mutation-types'
-import { storage } from '@/utils/Storage'
+import { Storage } from '@/utils/Storage'
 import store from '@/store'
 import { IStore } from '@/store/types'
 
@@ -15,9 +15,9 @@ export const actions = {
       if (code == 0) {
         console.log(result.token)
         const ex = 7 * 24 * 60 * 60 * 1000
-        storage.set(ACCESS_TOKEN, result.token, ex)
-        storage.set(CURRENT_USER, result, ex)
-        storage.set(IS_LOCKSCREEN, false)
+        Storage.set(ACCESS_TOKEN, result.token, ex)
+        Storage.set(CURRENT_USER, result, ex)
+        Storage.set(IS_LOCKSCREEN, false)
         commit('setToken', result.token)
         // todo
         commit('setUserInfo', result)
@@ -71,8 +71,8 @@ export const actions = {
   async logout({ commit }: ActionContext<IUserState, IStore>) {
     commit('setRoles', [])
     commit('setUserInfo', '')
-    storage.remove(ACCESS_TOKEN)
-    storage.remove(CURRENT_USER)
+    Storage.remove(ACCESS_TOKEN)
+    Storage.remove(CURRENT_USER)
     return Promise.resolve('')
   }
 }

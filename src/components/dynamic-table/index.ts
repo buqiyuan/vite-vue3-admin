@@ -1,2 +1,3 @@
 import DynamicTable from './dynamic-table.vue'
-export { DynamicTable }
+import TableQueryHeader from './components/table-query-header/index.vue'
+export { DynamicTable, TableQueryHeader }
