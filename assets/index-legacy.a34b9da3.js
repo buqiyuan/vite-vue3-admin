@@ -1,0 +1,1 @@
+System.register(["./vendor-legacy.0e2b8a1b.js","./form-modal-legacy.9cdfacc9.js"],(function(e){"use strict";var t,n,c;return{setters:[function(e){t=e.f,n=e.b8},function(e){c=e.b}],execute:function(){e("u",(e=>{let r;const u=document.createElement("div");return r=t(c,{...e,remove:()=>{r=null,n(null,u),u.remove()}}),n(r,u),r}))}}}));
