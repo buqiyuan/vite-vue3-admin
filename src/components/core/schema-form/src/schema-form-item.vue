@@ -12,6 +12,16 @@
       :wrapper-col="itemLabelWidthProp.wrapperCol"
       :rules="getRules"
     >
+      <!-- 前置插槽 -->
+      <template v-if="schema.beforeSlot">
+        <slot v-if="isString(schema.beforeSlot)" :name="schema.beforeSlot" v-bind="getValues">
+        </slot>
+        <component
+          :is="schema.beforeSlot(getValues)"
+          v-if="isFunction(schema.beforeSlot)"
+        ></component>
+      </template>
+      <!-- 自定义插槽 -->
       <slot v-if="schema.slot" :name="schema.slot" v-bind="getValues"> </slot>
       <component
         :is="getComponent"
@@ -38,6 +48,14 @@
           ></component>
         </template>
       </component>
+      <!-- 后置插槽 -->
+      <template v-if="schema.afterSlot">
+        <slot v-if="isString(schema.afterSlot)" :name="schema.afterSlot" v-bind="getValues"> </slot>
+        <component
+          :is="schema.afterSlot(getValues)"
+          v-if="isFunction(schema.afterSlot)"
+        ></component>
+      </template>
     </Form.Item>
   </Col>
 </template>
@@ -108,6 +126,7 @@
     }['true'];
   });
 
+  // @ts-ignore
   const getValues = computed<RenderCallbackParams>(() => {
     const { formModel, schema, tableInstance } = props;
 
@@ -382,36 +401,34 @@
     return rules;
   });
 
-  const fetchRemoteData = async (request) => {
-    if (request) {
-      const { component } = unref(schema);
+  const fetchRemoteData = async (request: PromiseFn<RenderCallbackParams, any>) => {
+    const { component } = unref(schema);
 
-      try {
-        const newSchema = {
-          ...unref(schema),
-          loading: true,
-          componentProps: {
-            ...unref(getComponentProps),
-            options: [],
-          } as ComponentProps,
-        };
-        updateSchema(newSchema);
-        const result = await request(unref(getValues));
-        if (['Select', 'RadioGroup', 'CheckBoxGroup'].some((n) => n === component)) {
-          newSchema.componentProps.options = result;
-        } else if (['TreeSelect', 'Tree'].some((n) => n === component)) {
-          newSchema.componentProps.treeData = result;
-        }
-        if (newSchema.componentProps) {
-          newSchema.componentProps.requestResult = result;
-        }
-        newSchema.loading = false;
-        updateSchema(newSchema);
-      } finally {
-        nextTick(() => {
-          schema.value.loading = false;
-        });
+    try {
+      const newSchema = Object.assign(schema.value, {
+        loading: true,
+        componentProps: {
+          ...unref(getComponentProps),
+          options: [],
+        },
+      });
+      const componentProps = newSchema.componentProps as ComponentProps;
+      updateSchema(newSchema);
+      // @ts-ignore
+      const result = await request({ ...unref(getValues), schema: newSchema });
+      if (['Select', 'RadioGroup', 'CheckBoxGroup'].some((n) => n === component)) {
+        componentProps.options = result;
+      } else if (['TreeSelect', 'Tree'].some((n) => n === component)) {
+        componentProps.treeData = result;
       }
+      if (newSchema.componentProps) {
+        newSchema.componentProps.requestResult = result;
+      }
+      newSchema.loading = false;
+      updateSchema(newSchema);
+    } finally {
+      await nextTick();
+      schema.value.loading = false;
     }
   };
 
@@ -443,3 +460,10 @@
     initRequestConfig();
   });
 </script>
+
+<style lang="less" scoped>
+  :deep(.ant-form-item-control-input-content) {
+    display: flex;
+    align-items: center;
+  }
+</style>

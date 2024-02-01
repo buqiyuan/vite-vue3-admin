@@ -4,12 +4,12 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import legacy from '@vitejs/plugin-legacy';
 import vue from '@vitejs/plugin-vue';
 import checker from 'vite-plugin-checker';
-import { viteMockServe } from 'vite-plugin-mock';
 import Components from 'unplugin-vue-components/vite';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import Unocss from 'unocss/vite';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import dayjs from 'dayjs';
+import mockServerPlugin from '@admin-pkg/vite-plugin-msw/vite';
 import pkg from './package.json';
 import type { UserConfig, ConfigEnv } from 'vite';
 
@@ -31,6 +31,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   const { VITE_BASE_URL, VITE_DROP_CONSOLE } = loadEnv(mode, CWD);
 
   const isBuild = command === 'build';
+  const mainFilePath = resolve(CWD, 'src/main.ts');
+  const polyfills = ['es.promise.with-resolvers'];
 
   return {
     base: VITE_BASE_URL,
@@ -51,30 +53,30 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       vueJsx({
         // options are passed on to @vue/babel-plugin-jsx
       }),
-
+      mockServerPlugin({ build: isBuild }),
       legacy({
         targets: ['defaults', 'not IE 11', 'chrome 79', 'maintained node versions'],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+        // ctrl + p node_modules/core-js/modules
         // 根据你自己需要导入相应的polyfill:  https://github.com/vitejs/vite/tree/main/packages/plugin-legacy#polyfill-specifiers
-        modernPolyfills: ['es.promise.finally', 'es/array', 'es/map', 'es/set'],
+        modernPolyfills: [...polyfills],
       }),
+      // 由于 @vitejs/plugin-legacy 只在构建中运行，所以这里手动兼容一下以便于开发环境下也能引入 polyfill
+      {
+        name: 'dev-auto-import-polyfills',
+        apply: 'serve',
+        transform(code, id) {
+          if (id === mainFilePath) {
+            const imports = polyfills.map((n) => `import "core-js/modules/${n}.js"`).join(';');
+            return `${imports};${code}`;
+          }
+        },
+      },
       createSvgIconsPlugin({
         // Specify the icon folder to be cached
         iconDirs: [resolve(CWD, 'src/assets/icons')],
         // Specify symbolId format
         symbolId: 'svg-icon-[dir]-[name]',
-      }),
-      viteMockServe({
-        ignore: /^_/,
-        mockPath: 'mock',
-        localEnabled: !isBuild,
-        prodEnabled: isBuild,
-        logger: true,
-        injectCode: `
-          import { setupProdMockServer } from '../mock/_createProductionServer';
-
-          setupProdMockServer();
-          `,
       }),
       Components({
         dts: 'types/components.d.ts',
@@ -127,16 +129,22 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       port: 8088,
       proxy: {
         '/api': {
-          target: 'https://nest-api.buqiyuan.site/api/',
-          // target: 'http://localhost:7001',
+          target: 'https://nest-api.buqiyuan.site',
+          // target: 'http://127.0.0.1:7001',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
         '/ws-api': {
           target: 'wss://nest-api.buqiyuan.site',
-          // target: 'http://localhost:7002',
+          // target: 'http://127.0.0.1:7002',
           changeOrigin: true, //是否允许跨域
           ws: true,
+        },
+        '/upload': {
+          target: 'http://127.0.0.1:7001/upload',
+          changeOrigin: true,
+          ws: true,
+          rewrite: (path) => path.replace(new RegExp(`^/upload`), ''),
         },
       },
     },
@@ -150,7 +158,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       ],
     },
     esbuild: {
-      pure: VITE_DROP_CONSOLE ? ['console.log', 'debugger'] : [],
+      pure: VITE_DROP_CONSOLE === 'true' ? ['console.log', 'debugger'] : [],
       supported: {
         // https://github.com/vitejs/vite/pull/8665
         'top-level-await': true,

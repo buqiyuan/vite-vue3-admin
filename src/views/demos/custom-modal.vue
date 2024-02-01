@@ -9,7 +9,7 @@
         <a
           class="text-blue-500"
           target="_blank"
-          href="https://github.com/buqiyuan/vite-vue3-admin/blob/main/src/views/demos/custom-modal.vue"
+          href="https://github.com/buqiyuan/vue3-antdv-admin/blob/main/src/views/demos/custom-modal.vue"
         >
           查看源码
         </a>
@@ -31,7 +31,7 @@
   import { reactive } from 'vue';
   import { Alert, Space } from 'ant-design-vue';
   import { DraggableModal } from '@/components/core/draggable-modal';
-  import { useModal } from '@/hooks/useModal/';
+  import { useModal } from '@/hooks/useModal';
 
   defineOptions({
     name: 'CustomModal',

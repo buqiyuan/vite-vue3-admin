@@ -5,7 +5,7 @@
         <a
           class="text-blue-500"
           target="_blank"
-          href="https://github.com/buqiyuan/vite-vue3-admin/blob/main/src/views/demos/form/basic-form/index.vue"
+          href="https://github.com/buqiyuan/vue3-antdv-admin/blob/main/src/views/demos/form/basic-form/index.vue"
         >
           查看源码
         </a>
@@ -37,7 +37,6 @@
             :api="optionsListApi"
             show-search
             option-filter-prop="label"
-            result-field="list"
             label-field="name"
             value-field="id"
           />
@@ -48,7 +47,6 @@
             :api="optionsListApi"
             show-search
             :filter-option="false"
-            result-field="list"
             label-field="name"
             value-field="id"
             :params="searchParams"
@@ -66,7 +64,7 @@
   import { Alert, message, Select } from 'ant-design-vue';
   import { schemas } from './form-schema';
   import { useForm, ApiSelect } from '@/components/core/schema-form';
-  import { optionsListApi } from '@/api/demos/select';
+  import { optionsListApi } from '@/api/demo/select';
 
   defineOptions({
     name: 'DemosFormBasicForm',

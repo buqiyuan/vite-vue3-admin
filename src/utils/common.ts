@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import type { DataNode } from 'ant-design-vue/es/vc-tree-select/interface';
 
 /**
  * @description 处理首字母大写 abc => Abc
@@ -32,15 +33,12 @@ export const randomColor = (type: 'rgb' | 'hex' | 'hsl'): string => {
  * @param text
  */
 export const copyText = (text: string) => {
-  return new Promise((resolve) => {
-    const copyInput = document.createElement('input'); //创建一个input框获取需要复制的文本内容
-    copyInput.value = text;
-    document.body.appendChild(copyInput);
-    copyInput.select();
-    document.execCommand('copy');
-    copyInput.remove();
-    resolve(true);
-  });
+  const copyInput = document.createElement('input'); //创建一个input框获取需要复制的文本内容
+  copyInput.value = text;
+  document.body.appendChild(copyInput);
+  copyInput.select();
+  document.execCommand('copy');
+  copyInput.remove();
 };
 
 /**
@@ -152,9 +150,58 @@ export const toHump = (name) => {
 
 /** 模拟异步请求，实用性不高，主要用于demo模拟请求 */
 export const waitTime = <T>(time = 100, data: any = true): Promise<T> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data);
-    }, time);
-  });
+  const { promise, resolve } = Promise.withResolvers<T>();
+  setTimeout(() => {
+    resolve(data);
+  }, time);
+  return promise;
+};
+
+export function findPath<T extends Key>(
+  tree: Recordable[],
+  targetId: T,
+  field = 'id',
+  currentPath: T[] = [],
+): T[] | null {
+  // 遍历树中的每个节点
+  for (const node of tree) {
+    // 将当前节点的 ID 添加到路径中
+    const path = [...currentPath, node[field]];
+
+    // 如果找到目标节点，返回路径
+    if (node.id === targetId) {
+      return path;
+    }
+
+    // 如果当前节点有子节点，则递归查找子节点
+    if (node.children && node.children.length > 0) {
+      const childPath = findPath(node.children, targetId, field, path);
+      if (childPath) {
+        return childPath;
+      }
+    }
+  }
+
+  // 没有找到目标节点，返回 null
+  return null;
+}
+
+export const str2tree = (str: string, treeData: DataNode[] = [], separator = ':') => {
+  return str.split(separator).reduce((prev, curr, currentIndex, arr) => {
+    const path = arr.slice(0, currentIndex + 1).join(':');
+    const index = prev.findIndex((item) => item?.path === path);
+    if (index !== -1) {
+      return prev[index].children;
+    } else {
+      const item: DataNode = {
+        // key: curr,
+        path,
+        value: curr,
+        label: curr,
+        children: [],
+      };
+      prev.push(item);
+      return item.children!;
+    }
+  }, treeData);
 };
