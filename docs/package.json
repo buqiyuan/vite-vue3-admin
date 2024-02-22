@@ -1,0 +1,31 @@
+{
+  "name": "vue3-antdv-admin-docs",
+  "version": "0.0.1",
+  "description": "vue3-antdv-admin 中后台管理系统的说明文档",
+  "author": {
+    "name": "buqiyuan",
+    "email": "1743369777@qq.com",
+    "url": "https://github.com/buqiyuan"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/buqiyuan/vue3-antdv-admin-docs",
+  "repository": {
+    "url": "https://github.com/buqiyuan/vue3-antdv-admin-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/buqiyuan/vue3-antdv-admin-docs/issues"
+  },
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "serve": "vitepress serve",
+    "deploy": "pnpm build && pnpm -F playground build"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.16",
+    "typescript": "5.3.3",
+    "unplugin-icons": "^0.18.5",
+    "vitepress": "1.0.0-rc.44"
+  }
+}

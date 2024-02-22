@@ -26,10 +26,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # run: pnpm run --filter \"./packages/**\" build
+      - name: Build
+        shell: bash
+        run: pnpm --filter "./packages/*" build
 
       - name: Publish 🚀
         shell: bash
-        run: pnpm publish --filter ./packages/* --access public --no-git-checks
+        run: pnpm publish --filter ./packages/* --access public --no-git-checks --registry https://registry.npmjs.org --verbose
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

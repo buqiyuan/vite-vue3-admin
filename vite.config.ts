@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 import { loadEnv } from 'vite';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import legacy from '@vitejs/plugin-legacy';
+import mkcert from 'vite-plugin-mkcert';
 import vue from '@vitejs/plugin-vue';
 import checker from 'vite-plugin-checker';
 import Components from 'unplugin-vue-components/vite';
@@ -28,11 +28,10 @@ const __APP_INFO__ = {
 // https://vitejs.dev/config/
 export default ({ command, mode }: ConfigEnv): UserConfig => {
   // 环境变量
-  const { VITE_BASE_URL, VITE_DROP_CONSOLE } = loadEnv(mode, CWD);
+  const { VITE_BASE_URL, VITE_DROP_CONSOLE, VITE_MOCK_IN_PROD } = loadEnv(mode, CWD);
 
+  const isDev = command === 'serve';
   const isBuild = command === 'build';
-  const mainFilePath = resolve(CWD, 'src/main.ts');
-  const polyfills = ['es.promise.with-resolvers'];
 
   return {
     base: VITE_BASE_URL,
@@ -53,25 +52,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       vueJsx({
         // options are passed on to @vue/babel-plugin-jsx
       }),
-      mockServerPlugin({ build: isBuild }),
-      legacy({
-        targets: ['defaults', 'not IE 11', 'chrome 79', 'maintained node versions'],
-        additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-        // ctrl + p node_modules/core-js/modules
-        // 根据你自己需要导入相应的polyfill:  https://github.com/vitejs/vite/tree/main/packages/plugin-legacy#polyfill-specifiers
-        modernPolyfills: [...polyfills],
-      }),
-      // 由于 @vitejs/plugin-legacy 只在构建中运行，所以这里手动兼容一下以便于开发环境下也能引入 polyfill
-      {
-        name: 'dev-auto-import-polyfills',
-        apply: 'serve',
-        transform(code, id) {
-          if (id === mainFilePath) {
-            const imports = polyfills.map((n) => `import "core-js/modules/${n}.js"`).join(';');
-            return `${imports};${code}`;
-          }
-        },
-      },
+      mkcert(),
+      mockServerPlugin({ build: isBuild && VITE_MOCK_IN_PROD === 'true' }),
       createSvgIconsPlugin({
         // Specify the icon folder to be cached
         iconDirs: [resolve(CWD, 'src/assets/icons')],
@@ -98,13 +80,14 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         ],
       }),
       // https://github.com/fi3ework/vite-plugin-checker
-      checker({
-        typescript: true,
-        vueTsc: true,
-        eslint: {
-          lintCommand: 'eslint "./src/**/*.{.vue,ts,tsx}"', // for example, lint .ts & .tsx
-        },
-      }),
+      isDev &&
+        checker({
+          typescript: true,
+          vueTsc: true,
+          eslint: {
+            lintCommand: 'eslint "./src/**/*.{.vue,ts,tsx}"', // for example, lint .ts & .tsx
+          },
+        }),
     ],
     css: {
       preprocessorOptions: {
@@ -112,8 +95,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           javascriptEnabled: true,
           modifyVars: {},
           additionalData: `
-            @primary-color: #00b96b; 
-            @header-height: 60px; 
+            @import '@/styles/variables.less'; 
           `,
         },
         // scss: {
@@ -134,14 +116,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
-        '/ws-api': {
-          target: 'wss://nest-api.buqiyuan.site',
-          // target: 'http://127.0.0.1:7002',
-          changeOrigin: true, //是否允许跨域
-          ws: true,
-        },
         '/upload': {
-          target: 'http://127.0.0.1:7001/upload',
+          target: 'hhttps://nest-api.buqiyuan.site/upload',
+          // target: 'http://127.0.0.1:7001/upload',
           changeOrigin: true,
           ws: true,
           rewrite: (path) => path.replace(new RegExp(`^/upload`), ''),
@@ -159,10 +136,23 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       },
     },
     build: {
-      target: 'es2017',
+      target: 'es2022',
       minify: 'esbuild',
-      cssTarget: 'chrome79',
+      cssTarget: 'chrome89',
       chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        output: {
+          // minifyInternalExports: false,
+          //TODO fix circular imports
+          manualChunks(id) {
+            if (id.includes('/src/locales/helper.ts')) {
+              return 'vendor';
+            } else if (id.includes('ant-design-vue')) {
+              return 'vendor';
+            }
+          },
+        },
+      },
     },
   };
 };
