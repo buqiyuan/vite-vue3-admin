@@ -10,6 +10,7 @@ import Unocss from 'unocss/vite';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import dayjs from 'dayjs';
 import mockServerPlugin from '@admin-pkg/vite-plugin-msw/vite';
+import TinymceResourcePlugin from '@admin-pkg/vite-plugin-tinymce-resource';
 import pkg from './package.json';
 import type { UserConfig, ConfigEnv } from 'vite';
 
@@ -52,8 +53,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       vueJsx({
         // options are passed on to @vue/babel-plugin-jsx
       }),
-      mkcert(),
+      // 指定 mkcert 的下载源为 coding，从 coding.net 镜像下载证书
+      mkcert({ source: 'coding' }),
       mockServerPlugin({ build: isBuild && VITE_MOCK_IN_PROD === 'true' }),
+      TinymceResourcePlugin({ baseUrl: '/tinymce-resource/' }),
       createSvgIconsPlugin({
         // Specify the icon folder to be cached
         iconDirs: [resolve(CWD, 'src/assets/icons')],
@@ -87,6 +90,9 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           eslint: {
             lintCommand: 'eslint "./src/**/*.{.vue,ts,tsx}"', // for example, lint .ts & .tsx
           },
+          overlay: {
+            initialIsOpen: false,
+          },
         }),
     ],
     css: {
@@ -94,16 +100,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         less: {
           javascriptEnabled: true,
           modifyVars: {},
-          additionalData: `
-            @import '@/styles/variables.less'; 
-          `,
+          // additionalData: `
+          //   @import '@/styles/variables.less';
+          // `,
         },
-        // scss: {
-        //   additionalData: `
-        //   @use 'sass:math';
-        //   @import "src/styles/global.scss";
-        //   `,
-        // },
       },
     },
     server: {

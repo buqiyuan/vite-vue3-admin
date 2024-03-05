@@ -9,12 +9,8 @@
 - 直接通过 chrome 快速 debugger
 - 不存在跨域问题
 
-## 缺点
-
-由于浏览器 service Worker API 使用限制：只能在 https（已安装证书）、localhost、127.0.0.1 等服务下使用，否则控制台会出现 [MSW] Mocking enabled (fallback mode) 日志，也就是说 http 域名服务，包括本地 IP 服务，例如：http://192.168.31.171:8088/ 等服务下不可用。
-
 > [!NOTE]
-> 由于项目中使用到了 [vite-plugin-mkcert](https://github.com/liuweiGL/vite-plugin-mkcert) 插件，该插件使用 mkcert 为 vite https 开发服务提供证书支持，所以上述的缺点在本地开发中理论上不会出现不可用的问题。但若要在生产环境中使用 mock，则服务端需要开启 https, 同时也要安装证书，没有证书 msw 会直接报错！
+> 当 `Service Worker` 无法浏览器中正常运行时，`msw` 将采用 `fallback mode`，回退到传统的 `fetch/XHR` 补丁方式，即通过拦截 `fetch` 或 `XMLHttpRequest` 以保证 `mock` 功能的正常使用。如果你不需要通过 `network` 查看 `mock` 相关的网络请求，则无需关心此问题。
 
 ## 如何使用 msw
 

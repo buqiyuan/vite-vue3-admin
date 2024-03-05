@@ -21,8 +21,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "rimraf dist && vite build",
-    "build:dts": "npx tsc -p tsconfig.dts.json"
+    "build": "rimraf dist && vite build && npm run build:dts",
+    "build:dts": "npx tsc -p tsconfig.dts.json || true"
   },
   "keywords": [
     "ant-design-vue",

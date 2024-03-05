@@ -3,15 +3,14 @@ import {
   File,
   compileFile,
   useVueImportMap,
-  OutputModes,
-  SFCOptions,
   mergeImportMap
 } from '@vue/repl'
+import type { Store, OutputModes, SFCOptions } from '@vue/repl'
 import { computed, ref, watch, watchEffect } from 'vue'
 import mainCode from '../template/main.vue?raw'
 import setupCode from '../template/setup?raw'
 import welcomeCode from '../template/welcome.vue?raw'
-import tsconfigCode from '../template/tsconfig.json?raw'
+import { Modal } from 'ant-design-vue'
 
 // retrieve some configuration options from the URL
 const query = new URLSearchParams(location.search)
@@ -19,7 +18,12 @@ const MAIN_FILE = 'src/PlaygroundMain.vue'
 const APP_FILE = 'src/App.vue'
 const SETUP_FILE = 'src/setup.ts'
 const IMPORT_MAP_FILE = 'import-map.json'
-const TSCONFIG = 'tsconfig.json'
+
+const isBuiltinFile = (filename: string) => {
+  return [MAIN_FILE, APP_FILE, SETUP_FILE, IMPORT_MAP_FILE].includes(
+    filename
+  )
+}
 
 export const useStore = () => {
   const typescriptVersion = ref('5.2.2')
@@ -92,11 +96,36 @@ export const useStore = () => {
     location.hash
   )
 
-  const mainFile = new File(MAIN_FILE, mainCode, true)
-  store.addFile(mainFile)
-  compileFile(store, mainFile)
-  store.mainFile = MAIN_FILE
-  store.addFile(new File(TSCONFIG, tsconfigCode, true))
+  store.deleteFile = (filename) => {
+    if (isBuiltinFile(filename)) {
+      return Modal.warning({
+        title: '内置文件，不允许删除',
+        centered: true
+      })
+    }
+
+    Modal.confirm({
+      title: 'Delete File',
+      centered: true,
+      content: `Are you sure you want to delete ${filename.replace(
+        /^src\//,
+        ''
+      )}?`,
+      onOk() {
+        if (store.activeFile.filename === filename) {
+          store.setActive(APP_FILE)
+        }
+        Reflect.deleteProperty(files.value, filename)
+      }
+    })
+  }
+
+  const initFiles = () => {
+    const mainFile = new File(MAIN_FILE, mainCode, true)
+    store.addFile(mainFile)
+    compileFile(store, mainFile)
+    store.mainFile = MAIN_FILE
+  }
 
   const genSetupCode = () => {
     return setupCode
@@ -131,6 +160,8 @@ export const useStore = () => {
     },
     { immediate: true }
   )
+
+  initFiles()
 
   return {
     vueVersion,
