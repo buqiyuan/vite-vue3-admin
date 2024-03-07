@@ -16,12 +16,13 @@
 
 <script lang="tsx" setup>
   import { computed, ref, h, type FunctionalComponent } from 'vue';
-  import { debounce, isFunction, isObject, isString } from 'lodash-es';
+  import { isFunction, isObject, isString } from 'lodash-es';
   import { Popconfirm, Tooltip, type TooltipProps } from 'ant-design-vue';
   import type { ActionItem } from '../types/tableAction';
   import type { CustomRenderParams } from '../types/column';
   import { hasPermission } from '@/permission';
   import { Icon } from '@/components/basic/icon';
+  import { isPromise } from '@/utils/is';
 
   const ActionItemRender: FunctionalComponent<ActionItem> = (action, { slots }) => {
     const { popConfirm, tooltip } = action;
@@ -88,13 +89,17 @@
         const onClick = item.onClick;
 
         if (isFunction(onClick) && !hasClickFnFlag(onClick)) {
-          item.onClick = debounce(async () => {
-            const key = getKey(item, index);
-            loadingMap.value.set(key, true);
-            await onClick(props.columnParams).finally(() => {
-              loadingMap.value.delete(key);
-            });
-          });
+          item.onClick = async () => {
+            const callbackRes = onClick(props.columnParams);
+
+            if (isPromise(callbackRes)) {
+              const key = getKey(item, index);
+              loadingMap.value.set(key, true);
+              await callbackRes.finally(() => {
+                loadingMap.value.delete(key);
+              });
+            }
+          };
           setClickFnFlag(item.onClick);
         }
         if (item.icon) {

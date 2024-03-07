@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import Components from 'unplugin-vue-components/vite';
@@ -83,7 +83,7 @@ export default defineConfig({
   ],
 });
 
-function myPlugin(): Plugin {
+function myPlugin(): PluginOption {
   const file = resolve(sourceDir, './permission');
 
   return {

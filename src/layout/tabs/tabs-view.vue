@@ -23,20 +23,20 @@
     <div class="tabs-view-content" :style="{ overflow }">
       <router-view v-slot="{ Component }">
         <template v-if="Component">
-          <Transition
-            :name="Object.is(route.meta?.transitionName, false) ? '' : 'fade-transform'"
-            mode="out-in"
-            appear
-            @before-leave="overflow = 'hidden'"
-            @after-leave="overflow = 'auto'"
-          >
-            <keep-alive :include="keepAliveComponents">
-              <Suspense>
+          <Suspense>
+            <Transition
+              name="fade-slide"
+              mode="out-in"
+              appear
+              @before-leave="overflow = 'hidden'"
+              @after-leave="overflow = 'auto'"
+            >
+              <keep-alive :include="keepAliveComponents">
                 <component :is="Component" :key="route.fullPath" />
-                <template #fallback> 正在加载... </template>
-              </Suspense>
-            </keep-alive>
-          </Transition>
+              </keep-alive>
+            </Transition>
+            <template #fallback> 正在加载... </template>
+          </Suspense>
         </template>
       </router-view>
     </div>
@@ -82,7 +82,7 @@
 
   try {
     const routesStr = Storage.get(TABS_ROUTES) as string | null | undefined;
-    routes = routesStr ? JSON.parse(routesStr) : [getSimpleRoute(route)];
+    routes = routesStr ? JSON.parse(routesStr).filter(Boolean) : [getSimpleRoute(route)];
   } catch (e) {
     routes = [getSimpleRoute(route)];
   }
@@ -102,7 +102,9 @@
 
   // 在页面关闭或刷新之前，保存数据
   window.addEventListener('beforeunload', () => {
-    Storage.set(TABS_ROUTES, JSON.stringify([tabsViewStore.getCurrentTab]));
+    if (tabsViewStore.getCurrentTab) {
+      Storage.set(TABS_ROUTES, JSON.stringify([tabsViewStore.getCurrentTab]));
+    }
   });
 
   // tabs 编辑（remove || add）
