@@ -1,6 +1,6 @@
 
 # https://stackoverflow.com/questions/53681522/share-variable-in-multi-stage-dockerfile-arg-before-from-not-substituted
-ARG PROJECT_DIR=/vue3-antdv-admin
+ARG PROJECT_DIR=/vite-vue3-admin
 
 FROM node:20-slim as builder
 ARG PROJECT_DIR

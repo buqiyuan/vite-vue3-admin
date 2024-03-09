@@ -1,5 +1,5 @@
 {
-  "name": "vue3-antdv-admin",
+  "name": "vite-vue3-admin",
   "version": "2.0.0",
   "packageManager": "pnpm@8.10.2",
   "engines": {
@@ -17,6 +17,7 @@
     "dev": "vite dev",
     "build": "rimraf dist && cross-env NODE_ENV=production vite build",
     "build:watch": "rimraf dist && cross-env NODE_ENV=production vite build --watch",
+    "build:pkg": "pnpm -r --filter='./packages/*' run build",
     "preview": "npm run build --watch && vite preview",
     "preview:dist": "vite preview",
     "deploy": "bash deploy.sh",
@@ -96,7 +97,7 @@
     "lightningcss": "^1.24.0",
     "lint-staged": "~15.2.2",
     "mockjs": "~1.1.0",
-    "msw": "^2.2.2",
+    "msw": "^2.2.3",
     "postcss": "~8.4.35",
     "postcss-html": "~1.6.0",
     "postcss-less": "~6.0.0",
@@ -125,9 +126,9 @@
   "__npminstall_done": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/buqiyuan/vue3-antdv-admin"
+    "url": "https://github.com/buqiyuan/vite-vue3-admin"
   },
-  "homepage": "https://buqiyuan.gitee.io/vue3-antdv-admin",
+  "homepage": "https://buqiyuan.gitee.io/vite-vue3-admin",
   "keywords": [
     "vue",
     "ant-design-vue",

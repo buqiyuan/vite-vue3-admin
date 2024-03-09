@@ -36,10 +36,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/buqiyuan/vue3-antdv-admin/tree/main/packages/components",
+    "url": "https://github.com/buqiyuan/vite-vue3-admin/tree/main/packages/components",
     "directory": "packages/components"
   },
-  "homepage": "https://github.com/buqiyuan/vue3-antdv-admin/tree/main/packages/components#readme",
+  "homepage": "https://github.com/buqiyuan/vite-vue3-admin/tree/main/packages/components#readme",
   "license": "MIT",
   "publishConfig": {
     "access": "public",

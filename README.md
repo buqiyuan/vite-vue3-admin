@@ -1,13 +1,13 @@
-# vue3-antdv-admin
+# vite-vue3-admin
 
 基于 vite5.x + vue3.x + antd-design-vue4.x + typescript5.x 的后台管理系统
 
 - 账号：admin，密码：a123456
-- [在线预览](http://buqiyuan.gitee.io/vue3-antdv-admin/)
-- [项目文档](https://buqiyuan.github.io/vue3-antdv-admin-docs/)
+- [在线预览](http://buqiyuan.gitee.io/vite-vue3-admin/)
+- [项目文档](https://buqiyuan.github.io/vite-vue3-admin-docs/)
 - [swagger 文档](https://nest-api.buqiyuan.site/api-docs/)
 - [后端仓库地址](https://github.com/buqiyuan/nest-admin)
-- [gitee 地址](https://gitee.com/buqiyuan/vue3-antdv-admin)
+- [gitee 地址](https://gitee.com/buqiyuan/vite-vue3-admin)
 - 根据 JSON 生成 typescript 的工具：[http://json2ts.com/](http://json2ts.com/)
 
 ## 安装使用
@@ -15,13 +15,13 @@
 - 获取项目代码
 
 ```bash
-git clone https://github.com/buqiyuan/vue3-antdv-admin
+git clone https://github.com/buqiyuan/vite-vue3-admin
 ```
 
 - 安装依赖
 
 ```bash
-cd vue3-antdv-admin
+cd vite-vue3-admin
 
 pnpm install
 
@@ -81,7 +81,7 @@ pnpm build
 
 | 微信 | 支付宝 |
 | :-: | :-: |
-| <img src="https://cdn.jsdelivr.net/gh/buqiyuan/MyImageHosting/imgs/vue3-antdv-admin/weixin.jpg" height="220" /> | <img src="https://cdn.jsdelivr.net/gh/buqiyuan/MyImageHosting/imgs/vue3-antdv-admin/zhifubao.jpg" height="220" /> |
+| <img src="https://cdn.jsdelivr.net/gh/buqiyuan/MyImageHosting/imgs/vite-vue3-admin/weixin.jpg" height="220" /> | <img src="https://cdn.jsdelivr.net/gh/buqiyuan/MyImageHosting/imgs/vite-vue3-admin/zhifubao.jpg" height="220" /> |
 
 ## 感谢 JetBrains 免费的开源授权
 

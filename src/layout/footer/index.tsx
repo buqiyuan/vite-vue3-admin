@@ -14,18 +14,18 @@ export default defineComponent({
       <>
         <a-layout-footer class={styles.page_footer}>
           <div class={styles.page_footer_link}>
-            <a href="https://buqiyuan.github.io/vue3-antdv-admin" target="_blank">
+            <a href="https://buqiyuan.github.io/vite-vue3-admin" target="_blank">
               在线预览
             </a>
-            <a href="https://github.com/buqiyuan/vue3-antdv-admin" target="_blank">
+            <a href="https://github.com/buqiyuan/vite-vue3-admin" target="_blank">
               <GithubOutlined />
             </a>
-            <a href="https://buqiyuan.github.io/vue3-antdv-admin-docs/" target="_blank">
+            <a href="https://buqiyuan.github.io/vite-vue3-admin-docs/" target="_blank">
               在线文档
             </a>
           </div>
           <div class={styles.copyright}>
-            Copyright <CopyrightOutlined /> 2022 vue3-antdv-admin
+            Copyright <CopyrightOutlined /> 2022 vite-vue3-admin
           </div>
         </a-layout-footer>
       </>
